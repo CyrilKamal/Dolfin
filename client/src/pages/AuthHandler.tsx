@@ -7,14 +7,29 @@ import { useNavigate } from "react-router-dom";
 import { setAccessToken } from "@/services/api";
 
 export const AuthHandler: React.FC = () => {
-    const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+    const { user, isAuthenticated, error, getAccessTokenSilently } = useAuth0();
     const { login, setNewUser, userState } = useCurrentUser();
     const { addNewUser } = useUsers();
     const navigate = useNavigate();
 
+    // Auth0 redirects back here with ?error=... when login fails or the user declines
+    // the consent screen. Send them back to the landing page instead of a blank page.
+    useEffect(() => {
+        if (error) {
+            console.warn("Auth0 login did not complete:", error.message);
+            navigate('/', { replace: true });
+        }
+    }, [error, navigate]);
+
     useEffect(() => {
         async function fetchAccessToken() {
-            const token = await getAccessTokenSilently();
+            let token: string;
+            try {
+                token = await getAccessTokenSilently();
+            } catch {
+                // Not logged in (e.g. login was declined); the error effect above redirects
+                return;
+            }
             setAccessToken(token);
             // Login to backend if Auth0 is authenticated
             if (isAuthenticated && user?.nickname) {
