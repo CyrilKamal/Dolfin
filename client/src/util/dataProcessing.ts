@@ -25,6 +25,8 @@ export const preprocessWeeklyData = (data: Transaction[]) => {
     end: endOfWeek(maxDate)
   });
 
+  // A week with no transactions keeps the previous week's balance
+  let lastAmount = 0;
   const weeklyData = weeks.map(week => {
     const weekData = data.filter(item => {
       const itemDate = new Date(item.date);
@@ -32,12 +34,13 @@ export const preprocessWeeklyData = (data: Transaction[]) => {
     });
 
     if (weekData.length === 0) {
-      return { date: `Week ${getISOWeek(week)} - ${format(startOfWeek(week), 'MMM dd')} to ${format(endOfWeek(week), 'MMM dd')}`, amount: 0 };
+      return { date: `Week ${getISOWeek(week)} - ${format(startOfWeek(week), 'MMM dd')} to ${format(endOfWeek(week), 'MMM dd')}`, amount: lastAmount };
     }
 
-    const latestTransaction = weekData.reduce((latest, current) => 
+    const latestTransaction = weekData.reduce((latest, current) =>
       new Date(current.date) > new Date(latest.date) ? current : latest
     );
+    lastAmount = latestTransaction.amount;
 
     const weekLabel = `Week ${getISOWeek(week)} - ${format(startOfWeek(week), 'MMM dd')} to ${format(endOfWeek(week), 'MMM dd')}`;
     return { date: weekLabel, amount: latestTransaction.amount };
@@ -56,6 +59,8 @@ export const preprocessMonthlyData = (data: Transaction[]) => {
     end: endOfMonth(maxDate)
   });
 
+  // A month with no transactions keeps the previous month's balance
+  let lastAmount = 0;
   const monthlyData = months.map(month => {
     const monthData = data.filter(item => {
       const itemDate = new Date(item.date);
@@ -63,12 +68,13 @@ export const preprocessMonthlyData = (data: Transaction[]) => {
     });
 
     if (monthData.length === 0) {
-      return { date: format(month, 'MMM yyyy'), amount: 0 };
+      return { date: format(month, 'MMM yyyy'), amount: lastAmount };
     }
 
-    const latestTransaction = monthData.reduce((latest, current) => 
+    const latestTransaction = monthData.reduce((latest, current) =>
       new Date(current.date) > new Date(latest.date) ? current : latest
     );
+    lastAmount = latestTransaction.amount;
 
     return { date: format(month, 'MMM yyyy'), amount: latestTransaction.amount };
   });

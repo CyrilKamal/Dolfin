@@ -81,13 +81,13 @@ const retrieveUsers = async () => {
 // For transaction assets
 const retrieveTransactionAssetsByUserId = async (userId) => {
   const query = `
-    SELECT t.id, t.account_id, t.category, t.amount, t.created_at, a.type
+    SELECT t.id, t.account_id, t.category, t.amount, t.date, t.created_at, a.type
     FROM [DolfinDB].[dbo].[transactions_table] t
     JOIN [DolfinDB].[dbo].[accounts_table] a ON t.account_id = a.id
     JOIN [DolfinDB].[dbo].[items_table] i ON a.item_id = i.id
     WHERE i.user_id = @param1
       AND a.type IN ('depository', 'investment')
-    ORDER BY created_at DESC;
+    ORDER BY t.date DESC, t.created_at DESC;
   `;
   const params = [{ name: "param1", type: sql.Int, value: userId }];
   const { recordset: transactions } = await queryDatabase(query, params);
@@ -97,13 +97,13 @@ const retrieveTransactionAssetsByUserId = async (userId) => {
 // For transaction liabilities
 const retrieveTransactionLiabilitiesByUserId = async (userId) => {
   const query = `
-    SELECT t.id, t.account_id, t.category, t.amount, t.created_at, a.type
+    SELECT t.id, t.account_id, t.category, t.amount, t.date, t.created_at, a.type
     FROM transactions_table t
     JOIN accounts_table a ON t.account_id = a.id
     JOIN items_table i ON a.item_id = i.id
     WHERE i.user_id = @param1
       AND a.type IN ('loan', 'credit')
-    ORDER BY created_at DESC;
+    ORDER BY t.date DESC, t.created_at DESC;
   `;
   const params = [{ name: "param1", type: sql.Int, value: userId }];
   const { recordset: transactions } = await queryDatabase(query, params);
