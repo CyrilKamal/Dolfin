@@ -77,7 +77,7 @@ function LandingPage() {
                 &ldquo;This app has saved me countless hours of work and helped
                 me get financial information faster than ever before.&rdquo;
               </p>
-              <footer className="text-sm">Cyril Kamal</footer>
+              <footer className="text-sm">Maya Thornton</footer>
             </blockquote>
           </div>
         </div>

@@ -100,6 +100,7 @@ const sanitizeTransactionAssets = (transactionAssets) =>
     "account_id",
     "category",
     "amount",
+    "date",
     "created_at",
     "type",
   ]);
@@ -115,6 +116,7 @@ const sanitizeTransactionLiabilities = (transactionLiabilities) =>
     "account_id",
     "category",
     "amount",
+    "date",
     "created_at",
     "type",
   ]);

@@ -132,7 +132,7 @@ export const NetworthPage: React.FC = () => {
 
   const aggregateTransactionsByDay = (data: any[]) => {
     return data.reduce((acc: { [key: string]: number }, item) => {
-      const date = new Date(item.created_at).toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+      const date = new Date(item.date).toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
       acc[date] = (acc[date] || 0) + item.amount;
       return acc;
     }, {});
@@ -141,14 +141,17 @@ export const NetworthPage: React.FC = () => {
   const transactionAssetsByDay = aggregateTransactionsByDay(transactionAssets);
   const transactionLiabilitiesByDay = aggregateTransactionsByDay(transactionLiabilities);
 
-  const computeBalances = (initialBalance: number, transactionsByDay: { [key: string]: number }) => {
+  // Stored amounts are negative for money spent. Spending lowers an asset balance but raises
+  // what is owed on a liability, so walking backwards the sign flips for liabilities.
+  const computeBalances = (initialBalance: number, transactionsByDay: { [key: string]: number }, isLiability = false) => {
     const days = Object.keys(transactionsByDay); // it's in reverse order
     let balances: { date: string; amount: number }[] = [];
     let previousBalance = initialBalance;
-  
+
     days.forEach(day => {
       balances.unshift({ date: day, amount: previousBalance }); // Prepend to the start
-      previousBalance -= transactionsByDay[day] || 0;
+      const change = transactionsByDay[day] || 0;
+      previousBalance = isLiability ? previousBalance + change : previousBalance - change;
     });
   
     return balances;
@@ -159,7 +162,7 @@ export const NetworthPage: React.FC = () => {
 
 
   const assetBalancesByDay =computeBalances(initialAssetsBalance, transactionAssetsByDay);
-  const liabilityBalancesByDay = computeBalances(initialLiabilitiesBalance, transactionLiabilitiesByDay);
+  const liabilityBalancesByDay = computeBalances(initialLiabilitiesBalance, transactionLiabilitiesByDay, true);
 
   
 

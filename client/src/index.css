@@ -92,5 +92,10 @@
 }
 
 .highlighted {
-  @apply bg-accent text-accent-foreground;
+  @apply bg-sky-700 font-semibold text-white hover:bg-sky-800 hover:text-white focus:bg-sky-800 focus:text-white;
+}
+
+/* A due date that is also the selected day keeps the selected colours, with a ring to show it's due */
+.highlighted[aria-selected="true"] {
+  @apply bg-primary text-primary-foreground ring-2 ring-sky-500 ring-offset-2 ring-offset-background;
 }
